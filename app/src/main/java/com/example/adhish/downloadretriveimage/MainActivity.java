@@ -26,7 +26,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     DBHelper dbHelper;
 
-    String imgurl="https://cdn1.truelancer.com/user-picture/101448-57ebbe2a80c84.jpg";
+//    String imgurl="https://cdn1.truelancer.com/user-picture/101448-57ebbe2a80c84.jpg";
+
+    String imgurl="http://www.appinessworld.com/images/career/slider-1.jpg";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,22 +55,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if(!loadImageFromDB()) {
+        if(!loadImageFromDB(imgurl)) {
             new GetImages(imgurl).execute();
         }
         else
         {
-            loadImageFromDB();
+            loadImageFromDB(imgurl);
         }
     }
 
     // Save the
-    Boolean saveImageInDB(byte[] byteArray) {
+    Boolean saveImageInDB(byte[] byteArray,String url) {
 
         try {
             dbHelper.open();
             byte[] inputData = byteArray;
-            dbHelper.insertImage(inputData);
+            dbHelper.insertImage(inputData,url);
             dbHelper.close();
             return true;
         } catch (Exception ioe) {
@@ -79,10 +81,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    Boolean loadImageFromDB() {
+    Boolean loadImageFromDB(String url) {
         try {
             dbHelper.open();
-            byte[] bytes = dbHelper.retreiveImageFromDB();
+            byte[] bytes = dbHelper.retreiveImageFromDB(url);
             dbHelper.close();
             // Show Image from DB in ImageView
             showMessage("Image Loaded from Database...");
@@ -113,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
 
-                saveImageInDB(byteArray);
+                saveImageInDB(byteArray,requestUrl);
 
                 Log.d(TAG,"Loading from web");
 
@@ -124,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected void onPostExecute(Object o) {
-            loadImageFromDB();
+            loadImageFromDB(imgurl);
         }
     }
 }

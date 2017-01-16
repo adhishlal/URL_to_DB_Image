@@ -17,6 +17,7 @@ public class DBHelper {
 
     public static final String IMAGE_ID = "id";
     public static final String IMAGE = "image";
+    public static final String IMAGE_URL = "imageurl";
     private final Context mContext;
 
     private DatabaseHelper mDbHelper;
@@ -29,7 +30,8 @@ public class DBHelper {
 
     private static final String CREATE_IMAGES_TABLE =
             "CREATE TABLE " + IMAGES_TABLE + " (" +
-                    IMAGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    IMAGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    IMAGE_URL+" VARCHAR,"
                     + IMAGE + " BLOB NOT NULL );";
 
 
@@ -67,17 +69,18 @@ public class DBHelper {
     }
 
     // Insert the image to the Sqlite DB
-    public void insertImage(byte[] imageBytes) {
+    public void insertImage(byte[] imageBytes,String url) {
         ContentValues cv = new ContentValues();
         cv.put(IMAGE, imageBytes);
+        cv.put(IMAGE_URL, url);
         mDb.insert(IMAGES_TABLE, null, cv);
     }
 
     // Get the image from SQLite DB
     // We will just get the last image we just saved for convenience...
-    public byte[] retreiveImageFromDB() {
+    public byte[] retreiveImageFromDB(String url) {
         Cursor cur = mDb.query(true, IMAGES_TABLE, new String[]{IMAGE,},
-                null, null, null, null,
+                "imageurl=?", new String[] {url}, null, null,
                 IMAGE_ID + " DESC", "1");
         if (cur.moveToFirst()) {
             byte[] blob = cur.getBlob(cur.getColumnIndex(IMAGE));
